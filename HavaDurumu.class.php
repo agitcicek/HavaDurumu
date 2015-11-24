@@ -106,6 +106,22 @@ class HavaDurumu
 		}
 	}
 
+	private function curlRequest($url){
+		$curl = curl_init();
+		curl_setopt($curl,CURLOPT_URL,$url);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_USERAGENT,$_SERVER['HTTP_USER_AGENT']);
+		curl_setopt($curl,CURLOPT_FOLLOWLOCATION,true);
+		curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
+		curl_setopt($curl, CURLOPT_REFERER, "googlebot");
+		curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 0);
+		curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+		$data = curl_exec($curl);
+		curl_close($curl);
+		$data = str_replace(array("\n","\t","\r"),NULL,$data);
+		return $data;
+	}
+
 	private function cityNameFormat($string)
 	{
 		$tr		=	array('ş','ç','Ş','Ç','Ö','ö','Ü','ü','İ','ı','Ğ','ğ');
@@ -119,7 +135,7 @@ class HavaDurumu
 		$city = $this->_cities[ $this->_selected_city ];
 		$city = $this->cityNameFormat($city);
 
-		$result = Curl::request('http://www.mgm.gov.tr/tahmin/il-ve-ilceler.aspx?m=' . $city );
+		$result = $this->curlRequest('http://www.mgm.gov.tr/tahmin/il-ve-ilceler.aspx?m=' . $city );
 
 		if($result)
 		{
